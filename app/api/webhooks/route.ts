@@ -1,14 +1,14 @@
 import { waitUntil } from "@vercel/functions";
 import type { Payment } from "@whop/sdk/resources.js";
-import { whopsdk } from "@/lib/whop-sdk";
+import { getWhopsdk } from "@/lib/whop-sdk";
 import { headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest): Promise<Response> {
 	// Validate the webhook to ensure it's from Whop
 	const requestBodyText = await request.text();
-	const headers = Object.fromEntries(request.headers);
-	const webhookData = whopsdk.webhooks.unwrap(requestBodyText, { headers });
+	const headersObj = Object.fromEntries(request.headers);
+	const webhookData = getWhopsdk().webhooks.unwrap(requestBodyText, { headers: headersObj });
 
 	// Handle the webhook event
 	if (webhookData.type === "payment.succeeded") {
@@ -28,7 +28,7 @@ async function handlePaymentSucceeded(payment: Payment) {
 export async function GET(request: NextRequest) {
 	try {
 	  const headersList = await headers();
-	  const { userId } = await whopsdk.verifyUserToken(headersList);
+	  const { userId } = await getWhopsdk().verifyUserToken(headersList);
 	  
 	  if (!userId) {
 		 return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
