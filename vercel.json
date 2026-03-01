@@ -1,3 +1,14 @@
 {
-  "installCommand": "corepack enable && pnpm install"
+  "installCommand": "corepack enable && pnpm install",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors *;"
+        }
+      ]
+    }
+  ]
 }
